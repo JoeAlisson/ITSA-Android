@@ -14,10 +14,13 @@ import android.bluetooth.BluetoothSocket;
 public class AndroidBluetoothConnection extends	BluetoothConnection<BluetoothDevice> {
 
 	private BluetoothAdapter adpter;
+	private boolean isConnected;
+	
 	
 	BluetoothSocket btSocket;
 	public AndroidBluetoothConnection() {
 		adpter = BluetoothAdapter.getDefaultAdapter();
+		isConnected = false;
 	}
 	
 	@Override
@@ -50,6 +53,7 @@ public class AndroidBluetoothConnection extends	BluetoothConnection<BluetoothDev
 			btSocket.connect();
 			output = btSocket.getOutputStream();
 			input =  btSocket.getInputStream();
+			isConnected = true;
 		} catch (NoSuchMethodException e) {
 			throw new IOException("Couldn't connect", e);
 		} catch (IllegalAccessException e) {
@@ -74,7 +78,10 @@ public class AndroidBluetoothConnection extends	BluetoothConnection<BluetoothDev
 
 	@Override
 	public boolean isConnected() {
-		return btSocket.isConnected();
+		// return btSocket.isConnected();
+		// Workaround to API < 14 devices
+		return isConnected;
+		
 	}
 
 	@Override
@@ -85,6 +92,12 @@ public class AndroidBluetoothConnection extends	BluetoothConnection<BluetoothDev
 	@Override
 	public String getName() {
 		return adpter.getName();
+	}
+
+	@Override
+	public void handleDisconnection() {
+		isConnected = false;
+		close();
 	}
 
 }

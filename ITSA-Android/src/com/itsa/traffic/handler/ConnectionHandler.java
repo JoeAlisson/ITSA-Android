@@ -29,6 +29,7 @@ public class ConnectionHandler extends PacketReader<AndroidBluetoothConnection, 
 	}
 	
 	public void connectTo(String address) throws IOException {
+		if(con.isConnected()) return;
 		con.connect(address);
 		(new Thread(this)).start();
 		con.sendPacket(new W_InitPacket(manager));
@@ -60,7 +61,8 @@ public class ConnectionHandler extends PacketReader<AndroidBluetoothConnection, 
 			try {
 				con.sendPacket(new W_PositionUpdate(currentPosition));
 			} catch (IOException e) {
-				e.printStackTrace();
+				//e.printStackTrace();
+				// implement all handles to disconnection on con's class.
 			}
 	}
 	

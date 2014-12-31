@@ -61,7 +61,6 @@ public class TrafficManager implements Manager {
 		if (trackingPosition)
 			mapHandler.go(currentPosition);
 
-		// TODO Send new Position Through bluetooth to Omnet
 		conectionHandler.sendUpdatePosition(currentPosition);
 	}
 
