@@ -7,10 +7,11 @@ import android.location.Location;
 import android.util.SparseArray;
 
 import com.google.android.gms.maps.SupportMapFragment;
+import com.itsa.conn.Manager;
 import com.itsa.traffic.element.Car;
 import com.itsa.traffic.element.Position;
 
-public class TrafficManager {
+public class TrafficManager implements Manager {
 
 	private SparseArray<Car> cars;
 	private MapHandler mapHandler;

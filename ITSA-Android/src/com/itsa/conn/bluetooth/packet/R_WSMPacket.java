@@ -8,13 +8,13 @@ import java.nio.ByteBuffer;
 import android.util.Log;
 
 import com.itsa.conn.bluetooth.AndroidBluetoothConnection;
-import com.itsa.conn.packet.AbstractReadablePacket;
+import com.itsa.traffic.handler.TrafficManager;
 
 /**
  * @author Alisson Oliveira
  *
  */
-public class R_WSMPacket extends AbstractReadablePacket<AndroidBluetoothConnection> {
+public class R_WSMPacket extends ReadableTrafficPacket {
 
 	final public static short OPCODE = 0x01;
 	private String name;
@@ -62,10 +62,10 @@ public class R_WSMPacket extends AbstractReadablePacket<AndroidBluetoothConnecti
 	}
 
 	/* (non-Javadoc)
-	 * @see com.itsa.conn.packet.ReadablePacket#process(com.itsa.conn.Connection)
+	 * @see com.itsa.conn.packet.ReadablePacket#process(com.itsa.conn.Connection, com.itsa.conn.Manager)
 	 */
 	@Override
-	public void process(AndroidBluetoothConnection conn) {
+	public void process(AndroidBluetoothConnection conn, TrafficManager manager) {
 		Log.i("VANET", "WSMessage: "
 				+ "\nname: " + name
 				+ "\nkink: " + kind
@@ -83,6 +83,7 @@ public class R_WSMPacket extends AbstractReadablePacket<AndroidBluetoothConnecti
 				+ "\nserial: " + serial
 				+ "\nposition: latitude x: " + senderPosX + " longitude y: " + senderPosY + " z: " +senderPosZ);
 		//conn.getActivity().addCar(new Car(senderAddress, senderPosX, senderPosY));;
+		
 	}
 
 }

@@ -6,12 +6,13 @@ package com.itsa.conn.packet;
 import java.nio.ByteBuffer;
 
 import com.itsa.conn.Connection;
+import com.itsa.conn.Manager;
 
 /**
  * @author Alisson Oliveira
  *
  */
-public abstract class AbstractReadablePacket<T extends Connection> implements ReadablePacket<T> {
+public abstract class AbstractReadablePacket<T extends Connection, M extends Manager> implements ReadablePacket<T, M> {
 	
 	protected String readString(ByteBuffer buf) {
 		char ch;

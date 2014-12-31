@@ -72,7 +72,7 @@ public abstract class Connection {
 		// write content to buffer
 		packet.write(this, writerBuffer);
 		
-		 // size (inclusive header) 
+		 // size
 		int dataSize = writerBuffer.position() - HEADER_SIZE; 
 		writerBuffer.position(0); 
 		// write header 

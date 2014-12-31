@@ -13,13 +13,13 @@ import com.itsa.conn.bluetooth.packet.W_PositionUpdate;
 import com.itsa.conn.packet.ReadablePacket;
 import com.itsa.traffic.element.Position;
 
-public class ConnectionHandler extends PacketReader<AndroidBluetoothConnection> implements PacketListener<AndroidBluetoothConnection> {
+public class ConnectionHandler extends PacketReader<AndroidBluetoothConnection, TrafficManager> implements PacketListener<AndroidBluetoothConnection, TrafficManager> {
 
 	private TrafficManager manager;
 	private int external_id;
 	
 	public ConnectionHandler(TrafficManager trafficManager) {
-		super(new AndroidBluetoothConnection());
+		super(new AndroidBluetoothConnection(), trafficManager);
 		this.manager = trafficManager;
 		setPacketListener(this);
 	}
@@ -35,14 +35,14 @@ public class ConnectionHandler extends PacketReader<AndroidBluetoothConnection> 
 	}
 
 	@Override
-	public void processPacket(ReadablePacket<AndroidBluetoothConnection> packet) {
-		packet.process(con);
+	public void processPacket(ReadablePacket<AndroidBluetoothConnection, TrafficManager> packet, TrafficManager manager) {
+		packet.process(con, manager);
 	}
 
 	@Override
-	protected ReadablePacket<AndroidBluetoothConnection> createPacket(short opcode) {
+	protected ReadablePacket<AndroidBluetoothConnection, TrafficManager> createPacket(short opcode) {
 		Log.i("Connection Handler", "Opcode received " + Integer.toHexString(opcode));
-		ReadablePacket<AndroidBluetoothConnection> packet = null;
+		ReadablePacket<AndroidBluetoothConnection, TrafficManager> packet = null;
 		switch (opcode) {
 		case R_WSMPacket.OPCODE:
 			packet = new R_WSMPacket();

@@ -9,17 +9,19 @@ import com.itsa.conn.packet.ReadablePacket;
 
 import android.util.Log;
 
-public abstract class PacketReader<T extends Connection> implements Runnable {
+public abstract class PacketReader<C extends Connection, M extends Manager> implements Runnable {
 
-	protected T con;
-	private PacketListener<T> pListener;
-	protected final ConcurrentLinkedQueue<ReadablePacket<T>> queue;
+	protected C con;
+	private PacketListener<C, M> pListener;
+	protected final ConcurrentLinkedQueue<ReadablePacket<C, M>> queue;
 	private boolean running;
 	private ReentrantLock lock;
+	private M manager;
 	
-	public PacketReader(T con) {
+	public PacketReader(C con, M manager) {
 		this.con = con;
-		queue = new ConcurrentLinkedQueue<ReadablePacket<T>>();
+		this.manager = manager;
+		queue = new ConcurrentLinkedQueue<ReadablePacket<C, M>>();
 		lock = new ReentrantLock();
 	}
 
@@ -32,7 +34,7 @@ public abstract class PacketReader<T extends Connection> implements Runnable {
 				ByteBuffer buf = con.read();
 				if (buf != null) {
 					short opcode = buf.getShort();
-					ReadablePacket<T> packet = createPacket(opcode);
+					ReadablePacket<C, M> packet = createPacket(opcode);
 					if (packet != null) {
 						packet.read(con, buf);
 						queue.add(packet);
@@ -60,7 +62,7 @@ public abstract class PacketReader<T extends Connection> implements Runnable {
 	private void handler() {
 		lock.lock();
 		while(!queue.isEmpty() && pListener != null)		
-			pListener.processPacket(queue.poll());
+			pListener.processPacket(queue.poll(), manager);
 		lock.unlock();
 	}
 
@@ -68,10 +70,9 @@ public abstract class PacketReader<T extends Connection> implements Runnable {
 		running = false;
 	}
 
-	protected abstract ReadablePacket<T> createPacket(short opcode);
+	protected abstract ReadablePacket<C, M> createPacket(short opcode);
 	
-
-	public void setPacketListener(PacketListener<T> pListiner) {
+	public void setPacketListener(PacketListener<C, M> pListiner) {
 		this.pListener = pListiner;
 		handlerPackets();
 	}

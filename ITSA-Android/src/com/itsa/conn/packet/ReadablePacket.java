@@ -6,15 +6,16 @@ package com.itsa.conn.packet;
 import java.nio.ByteBuffer;
 
 import com.itsa.conn.Connection;
+import com.itsa.conn.Manager;
 
 /**
  * @author Alisson Oliveira
  *
  */
-public interface ReadablePacket<T extends Connection> {
+public interface ReadablePacket<C extends Connection, M extends Manager> {
 	
-	void read(T conn, ByteBuffer buf);
+	void read(C conn, ByteBuffer buf);
 	
-	void process(T conn);
+	void process(C conn, M manager);
 
 }

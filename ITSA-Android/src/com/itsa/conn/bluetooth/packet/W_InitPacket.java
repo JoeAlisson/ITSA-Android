@@ -6,7 +6,6 @@ package com.itsa.conn.bluetooth.packet;
 import java.nio.ByteBuffer;
 
 import com.itsa.conn.bluetooth.AndroidBluetoothConnection;
-import com.itsa.conn.packet.AbstractWritablePacket;
 import com.itsa.traffic.element.Position;
 import com.itsa.traffic.handler.TrafficManager;
 
@@ -14,7 +13,7 @@ import com.itsa.traffic.handler.TrafficManager;
  * @author Alisson Oliveira
  *
  */
-public class W_InitPacket extends AbstractWritablePacket<AndroidBluetoothConnection> {
+public class W_InitPacket extends WritableTrafficPacket {
 
 	private TrafficManager manager;
 

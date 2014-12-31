@@ -6,14 +6,13 @@ package com.itsa.conn.bluetooth.packet;
 import java.nio.ByteBuffer;
 
 import com.itsa.conn.bluetooth.AndroidBluetoothConnection;
-import com.itsa.conn.packet.AbstractWritablePacket;
 import com.itsa.traffic.element.Position;
 
 /**
  * @author Alisson Oliveira
  *
  */
-public class W_PositionUpdate extends AbstractWritablePacket<AndroidBluetoothConnection> {
+public class W_PositionUpdate extends WritableTrafficPacket {
 
 	
 	private Position position;
