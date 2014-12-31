@@ -1,5 +1,7 @@
 package com.itsa.traffic;
 
+import java.io.IOException;
+
 import com.google.android.gms.maps.SupportMapFragment;
 import com.itsa.traffic.handler.TrafficManager;
 
@@ -7,6 +9,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 public class MainActivity extends ActionBarActivity {
 
@@ -51,7 +54,11 @@ public class MainActivity extends ActionBarActivity {
 		case R.id.action_settings:
 			return true;
 		case R.id.action_connect:
-			trafficManager.connectToOmnet();
+			try {
+				trafficManager.connectToOmnet();
+			} catch (IOException e) {
+				Toast.makeText(this, "couldn't connect ", Toast.LENGTH_SHORT).show();;
+			}
 		default:
 			break;
 		}

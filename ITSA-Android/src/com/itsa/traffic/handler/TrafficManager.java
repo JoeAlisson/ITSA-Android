@@ -1,5 +1,7 @@
 package com.itsa.traffic.handler;
 
+import java.io.IOException;
+
 import android.content.Context;
 import android.location.Location;
 import android.util.SparseArray;
@@ -97,8 +99,8 @@ public class TrafficManager {
 		stopLocationUpdates();
 	}
 
-	public void connectToOmnet() {
-
+	public void connectToOmnet() throws IOException {
+		conectionHandler.connect();
 	}
 
 }

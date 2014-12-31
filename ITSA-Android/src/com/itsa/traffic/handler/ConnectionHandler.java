@@ -28,8 +28,6 @@ public class ConnectionHandler extends PacketReader<AndroidBluetoothConnection> 
 		connectTo("14:2D:27:CD:A5:68");
 	}
 	
-	
-	
 	public void connectTo(String address) throws IOException {
 		con.connect(address);
 		(new Thread(this)).start();
