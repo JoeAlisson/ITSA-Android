@@ -18,6 +18,7 @@ import android.util.Log;
  *
  */
 public abstract class Connection {
+	
 	protected static int HEADER_SIZE = 2;
 	protected static ByteOrder BYTE_ORDER = ByteOrder.LITTLE_ENDIAN;
 	protected static int WRITE_BUFFER_SIZE = 64 * 1024;
@@ -28,10 +29,8 @@ public abstract class Connection {
 	private final ByteBuffer readerBuffer;
 
 	public Connection() {
-		writerBuffer = ByteBuffer.wrap(new byte[WRITE_BUFFER_SIZE]).order(
-				BYTE_ORDER);
-		readerBuffer = ByteBuffer.wrap(new byte[WRITE_BUFFER_SIZE]).order(
-				BYTE_ORDER);
+		writerBuffer = ByteBuffer.wrap(new byte[WRITE_BUFFER_SIZE]).order(BYTE_ORDER);
+		readerBuffer = ByteBuffer.wrap(new byte[WRITE_BUFFER_SIZE]).order(BYTE_ORDER);
 	}
 
 	/**
@@ -64,34 +63,36 @@ public abstract class Connection {
 	 *             - if something in connection goes wrong.
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public synchronized final void sendPacket(WritablePacket packet)
-			throws IOException {
+	public final void sendPacket(WritablePacket packet) throws IOException {
 		if (packet == null) {
 			return;
 		}
+		
+		synchronized (writerBuffer) {
+			writerBuffer.clear();
+			// reserve space for the size
+			writerBuffer.position(HEADER_SIZE);
+			writerBuffer.putShort(packet.getOpcode());
+			// write content to buffer
+			
+			packet.write(this, writerBuffer);
+			
+			// size
+			int dataSize = writerBuffer.position() - HEADER_SIZE;
+			writerBuffer.position(0);
+			// write header
+			writerBuffer.putShort((short) (dataSize));
 
-		writerBuffer.clear();
-		// reserve space for the size
-		writerBuffer.position(HEADER_SIZE);
-		writerBuffer.putShort(packet.getOpcode());
-		// write content to buffer
-		packet.write(this, writerBuffer);
+			writerBuffer.position(dataSize);
 
-		// size
-		int dataSize = writerBuffer.position() - HEADER_SIZE;
-		writerBuffer.position(0);
-		// write header
-		writerBuffer.putShort((short) (dataSize));
-
-		writerBuffer.position(dataSize);
-
-		writerBuffer.flip();
-		try {
-			write(writerBuffer);
-		} catch (IOException e) {
-			// somethig wents wrong
-			handleDisconnection();
-			throw e;
+			writerBuffer.flip();
+			try {
+				write(writerBuffer);
+			} catch (IOException e) {
+				// somethig wents wrong
+				handleDisconnection();
+				throw e;
+			}
 		}
 	}
 
@@ -103,31 +104,22 @@ public abstract class Connection {
 	 * @throws IOException
 	 *             - if something goes wrong in connection.
 	 */
-	private final synchronized void write(final ByteBuffer buf) throws IOException {
+	private final void write(final ByteBuffer buf) throws IOException {
 		if (output != null) {
-			Log.i("BT", "" + buf);
 			int l = buf.getShort();
-
 			byte[] array = new byte[l + HEADER_SIZE];
 			buf.position(0);
 			buf.get(array, 0, l);
 			Log.i("BT", "Sending " + l + "   array.l " + array.length);
-			Log.i("BT", " " + array);
 			output.write(array);
 			output.flush();
 		}
 	}
 
-	public final synchronized ByteBuffer read() throws IOException {
+	public final ByteBuffer read() throws IOException {
 		Log.i("BT", "Trying to read");
 		byte[] array;
 		try {
-			while (input.available() < 2 && isConnected()) {
-				try {
-					wait(300);
-				} catch (InterruptedException e) {
-				}
-			}
 			readerBuffer.clear();
 			if (!isConnected())
 				return null;
@@ -143,8 +135,8 @@ public abstract class Connection {
 		} catch (IOException e) {
 			handleDisconnection();
 			throw e;
-		} catch (NullPointerException e) {
-			// this happens when the input is null
+		} catch (Exception e) {
+			Log.e("Connection", ""+e);
 			return null;
 		}
 		Log.i("BT", "data fully received");

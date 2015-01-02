@@ -10,12 +10,18 @@ import com.itsa.conn.BluetoothConnection;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.util.Log;
 
+/**
+ * 
+ * @author Alisson Oliveira
+ *
+ */
 public class AndroidBluetoothConnection extends	BluetoothConnection<BluetoothDevice> {
 
 	private BluetoothAdapter adpter;
 	private boolean isConnected;
-	
+	private boolean canSend = false;
 	
 	BluetoothSocket btSocket;
 	public AndroidBluetoothConnection() {
@@ -96,8 +102,18 @@ public class AndroidBluetoothConnection extends	BluetoothConnection<BluetoothDev
 
 	@Override
 	public void handleDisconnection() {
+		Log.i("Connection", "handling Disconnection");
 		isConnected = false;
+		canSend = false;
 		close();
+	}
+	
+	public boolean canSend() {
+		return isConnected && canSend;
+	}
+	
+	public void canSend(boolean canSend) {
+		this.canSend = canSend;
 	}
 
 }

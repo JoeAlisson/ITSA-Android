@@ -7,16 +7,20 @@ import android.util.Log;
 import com.itsa.conn.PacketListener;
 import com.itsa.conn.PacketReader;
 import com.itsa.conn.bluetooth.AndroidBluetoothConnection;
+import com.itsa.conn.bluetooth.packet.R_InitPacket;
 import com.itsa.conn.bluetooth.packet.R_WSMPacket;
-import com.itsa.conn.bluetooth.packet.W_InitPacket;
 import com.itsa.conn.bluetooth.packet.W_PositionUpdate;
 import com.itsa.conn.packet.ReadablePacket;
 import com.itsa.traffic.element.Position;
 
+/**
+ * 
+ * @author Alisson Oliveira
+ *
+ */
 public class ConnectionHandler extends PacketReader<AndroidBluetoothConnection, TrafficManager> implements PacketListener<AndroidBluetoothConnection, TrafficManager> {
 
 	private TrafficManager manager;
-	private int external_id;
 	
 	public ConnectionHandler(TrafficManager trafficManager) {
 		super(new AndroidBluetoothConnection(), trafficManager);
@@ -32,7 +36,6 @@ public class ConnectionHandler extends PacketReader<AndroidBluetoothConnection, 
 		if(con.isConnected()) return;
 		con.connect(address);
 		(new Thread(this)).start();
-		con.sendPacket(new W_InitPacket(manager));
 	}
 
 	@Override
@@ -45,6 +48,9 @@ public class ConnectionHandler extends PacketReader<AndroidBluetoothConnection, 
 		Log.i("Connection Handler", "Opcode received " + Integer.toHexString(opcode));
 		ReadablePacket<AndroidBluetoothConnection, TrafficManager> packet = null;
 		switch (opcode) {
+		case R_InitPacket.OPCODE:
+			packet = new R_InitPacket();
+			break;
 		case R_WSMPacket.OPCODE:
 			packet = new R_WSMPacket();
 			break;
@@ -57,21 +63,12 @@ public class ConnectionHandler extends PacketReader<AndroidBluetoothConnection, 
 	
 	
 	public void sendUpdatePosition(Position currentPosition) {
-		if(con.isConnected())
+		if(con.canSend()){
 			try {
 				con.sendPacket(new W_PositionUpdate(currentPosition));
 			} catch (IOException e) {
-				//e.printStackTrace();
-				// implement all handles to disconnection on con's class.
+				e.printStackTrace();
 			}
+		}
 	}
-	
-	public void setId(int id) {
-		external_id = id;		
-	}
-	
-	public int getId() {
-		return external_id;
-	}
-
 }
