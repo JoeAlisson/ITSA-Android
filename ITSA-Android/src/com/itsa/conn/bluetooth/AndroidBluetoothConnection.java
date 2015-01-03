@@ -60,6 +60,7 @@ public class AndroidBluetoothConnection extends	BluetoothConnection<BluetoothDev
 			output = btSocket.getOutputStream();
 			input =  btSocket.getInputStream();
 			isConnected = true;
+			pendingDisconnection = false;
 		} catch (NoSuchMethodException e) {
 			throw new IOException("Couldn't connect", e);
 		} catch (IllegalAccessException e) {
@@ -102,7 +103,9 @@ public class AndroidBluetoothConnection extends	BluetoothConnection<BluetoothDev
 
 	@Override
 	public void handleDisconnection() {
+		if(!isConnected) return;
 		Log.i("Connection", "handling Disconnection");
+		pendingDisconnection = true;
 		isConnected = false;
 		canSend = false;
 		close();

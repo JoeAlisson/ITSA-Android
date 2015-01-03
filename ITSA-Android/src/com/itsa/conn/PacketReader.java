@@ -1,3 +1,18 @@
+/**
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see http://www.gnu.org/licenses/.
+ *
+ */
 package com.itsa.conn;
 
 import java.io.IOException;
@@ -9,6 +24,16 @@ import com.itsa.conn.packet.ReadablePacket;
 
 import android.util.Log;
 
+/**
+ * 
+ * @author Alisson Oliveira
+ * 
+ * Updated on: Jan 02, 2015
+ * 	
+ *
+ * @param <C>
+ * @param <M>
+ */
 public abstract class PacketReader<C extends Connection, M extends Manager> implements Runnable {
 
 	protected C con;
@@ -16,7 +41,7 @@ public abstract class PacketReader<C extends Connection, M extends Manager> impl
 	protected final ConcurrentLinkedQueue<ReadablePacket<C, M>> queue;
 	private boolean running;
 	private ReentrantLock lock;
-	private M manager;
+	protected M manager;
 	
 	public PacketReader(C con, M manager) {
 		this.con = con;
@@ -50,13 +75,14 @@ public abstract class PacketReader<C extends Connection, M extends Manager> impl
 		} while (running);
 	}
 	
-	private void handlerPackets() {
+	private void handlerPackets() {		
 		(new Thread(new Runnable() {
 			@Override
 			public void run() {
 				handler();	
 			}
 		})).start();
+		
 	}
 
 	private void handler() {
@@ -68,6 +94,7 @@ public abstract class PacketReader<C extends Connection, M extends Manager> impl
 
 	public void finish() {
 		running = false;
+		con.handleDisconnection();
 	}
 
 	protected abstract ReadablePacket<C, M> createPacket(short opcode);
