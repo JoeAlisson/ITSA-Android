@@ -28,7 +28,7 @@ import android.util.Log;
  * 
  * @author Alisson Oliveira
  * 
- * Updated on: Jan 02, 2015
+ * Updated on: Jan 03, 2015
  * 	
  *
  * @param <C>

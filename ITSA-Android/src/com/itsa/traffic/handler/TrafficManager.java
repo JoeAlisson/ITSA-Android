@@ -31,7 +31,7 @@ import com.itsa.traffic.element.Position;
  * 
  * @author Alisson Oliveira
  * 
- * Updated on: Jan 02, 2015
+ * Updated on: Jan 03, 2015
  *
  */
 public class TrafficManager implements Manager {
@@ -53,7 +53,7 @@ public class TrafficManager implements Manager {
 	}
 
 	public void addCar(Car car) {
-		cars.append(car.getId(), car);
+		cars.put(car.getId(), car);
 	}
 
 	public void updateTraffic() {

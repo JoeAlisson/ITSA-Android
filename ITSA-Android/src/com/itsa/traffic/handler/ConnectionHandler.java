@@ -24,10 +24,8 @@ import com.itsa.conn.PacketReader;
 import com.itsa.conn.bluetooth.AndroidBluetoothConnection;
 import com.itsa.conn.packet.ReadablePacket;
 import com.itsa.traffic.element.Position;
-import com.itsa.traffic.packet.R_ClosePacket;
 import com.itsa.traffic.packet.R_InitPacket;
 import com.itsa.traffic.packet.R_WSMPacket;
-import com.itsa.traffic.packet.W_ClosePacket;
 import com.itsa.traffic.packet.W_PositionUpdate;
 
 /**
@@ -75,9 +73,6 @@ public class ConnectionHandler extends PacketReader<AndroidBluetoothConnection, 
 		case R_InitPacket.OPCODE:
 			packet = new R_InitPacket();
 			break;
-		case R_ClosePacket.OPCODE:
-			packet = new R_ClosePacket();
-			break;
 		case R_WSMPacket.OPCODE:
 			packet = new R_WSMPacket();
 			break;
@@ -100,12 +95,6 @@ public class ConnectionHandler extends PacketReader<AndroidBluetoothConnection, 
 	}
 
 	public void onDestroy() {
-		try {
-			if(con.isConnected())
-				con.sendPacket(new W_ClosePacket());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 		finish();
 	}
 }

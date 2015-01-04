@@ -31,7 +31,7 @@ import android.util.Log;
  * 
  * @author Alisson Oliveira
  * 
- *         Updated on: Jan 02, 2015
+ *  Updated on: Jan 03, 2015
  *
  */
 public abstract class Connection {
@@ -44,13 +44,10 @@ public abstract class Connection {
 	protected OutputStream output;
 	private final ByteBuffer writerBuffer;
 	private final ByteBuffer readerBuffer;
-	protected boolean pendingDisconnection;
 
 	public Connection() {
-		writerBuffer = ByteBuffer.wrap(new byte[WRITE_BUFFER_SIZE]).order(
-				BYTE_ORDER);
-		readerBuffer = ByteBuffer.wrap(new byte[WRITE_BUFFER_SIZE]).order(
-				BYTE_ORDER);
+		writerBuffer = ByteBuffer.wrap(new byte[WRITE_BUFFER_SIZE]).order(BYTE_ORDER);
+		readerBuffer = ByteBuffer.wrap(new byte[WRITE_BUFFER_SIZE]).order(BYTE_ORDER);
 	}
 
 	/**
@@ -64,7 +61,6 @@ public abstract class Connection {
 		} finally {
 			input = null;
 		}
-
 		try {
 			output.close();
 		} catch (Exception e) {
@@ -111,10 +107,7 @@ public abstract class Connection {
 				write(writerBuffer, dataSize);
 			} catch (IOException e) {
 				// somethig wents wrong
-				if (!pendingDisconnection) {
-					handleDisconnection();
-					throw e;
-				}
+				handleDisconnection();
 			}
 		}
 	}
@@ -154,11 +147,8 @@ public abstract class Connection {
 				Log.i("BT", "received " + received);
 			} while (received < length);
 		} catch (IOException e) {
-			if (!pendingDisconnection) {
-				handleDisconnection();
-				throw e;
-			}
-			return null;
+			handleDisconnection();
+			throw e;
 		} catch (Exception e) {
 			Log.e("Connection", "" + e);
 			return null;
