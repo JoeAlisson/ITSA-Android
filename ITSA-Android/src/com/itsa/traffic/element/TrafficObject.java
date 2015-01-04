@@ -19,6 +19,7 @@ package com.itsa.traffic.element;
  * 
  * @author Alisson Oliveira
  * 
+ * Update on: Jan 04, 2015
  *
  */
 public abstract class TrafficObject {
@@ -28,12 +29,14 @@ public abstract class TrafficObject {
 	protected int id;
 	private String title;
 	private String description;
+	private long lastModified;
 
 	public TrafficObject(int id, double latitude, double longitude, String title, String description) {
 		this.id = id;
 		this.pos = new Position(latitude, longitude);
 		this.title = title;
 		this.description = description;
+		lastModified = System.currentTimeMillis();
 	}
 	
 	public Position getPosition() {
@@ -58,5 +61,10 @@ public abstract class TrafficObject {
 	public String getDescription() {
 		return description;
 	}
+
+	public long getLastModified() {
+		return lastModified;
+	}
+
 
 }
