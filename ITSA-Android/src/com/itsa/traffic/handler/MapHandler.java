@@ -63,12 +63,19 @@ public class MapHandler implements OnMapReadyCallback {
 		}
 	}
 	
-	
 	private Marker createMarker(TrafficObject object) {
 		if(map != null) {
 			return map.addMarker(object.getPosition().getMarker().title(object.getTitle()).snippet(object.getDescription()));
 		}
 		return null;
+	}
+	
+	public void removeObjects(SparseArray<? extends TrafficObject> trafficObjects) {
+		for (int i = 0; i < trafficObjects.size(); i++) {
+			TrafficObject obj = trafficObjects.valueAt(i);
+			Marker marker = objects.get(obj.getId());
+			if(marker != null) marker.remove();
+		}
 	}
 	
 	public void update(SparseArray<? extends TrafficObject> trafficObjects) {

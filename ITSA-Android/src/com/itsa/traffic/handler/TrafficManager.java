@@ -35,7 +35,7 @@ import com.itsa.traffic.element.Position;
  *
  */
 public class TrafficManager implements Manager {
-
+	private final long fogetTime = 5*60*1000; // 5 min 
 	private SparseArray<Car> cars;
 	private MapHandler mapHandler;
 	private LocationHandler locationHandler;
@@ -43,6 +43,7 @@ public class TrafficManager implements Manager {
 	private Context context;
 	private Position currentPosition;
 	private boolean trackingPosition = true;
+	
 
 	public TrafficManager(Context ctx) {
 		this.context = ctx;
@@ -57,13 +58,16 @@ public class TrafficManager implements Manager {
 	}
 
 	public void updateTraffic() {
+		SparseArray<Car> toRemove = new SparseArray<Car>();
 		for (int i = 0; i < cars.size(); i++) {
 			Car c = cars.valueAt(i);
-			if((System.currentTimeMillis() - c.getLastModified()) > 5*60*1000) {
+			if((System.currentTimeMillis() - c.getLastModified()) > fogetTime) {
+				toRemove.put(c.getId(), c);
 				cars.remove(c.getId());
 				i--;
 			}
 		}
+		mapHandler.removeObjects(toRemove);
 		mapHandler.update(cars);
 	}
 
