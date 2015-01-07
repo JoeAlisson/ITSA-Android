@@ -20,7 +20,6 @@ import android.util.SparseArray;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.Marker;
 import com.itsa.traffic.element.Position;
 import com.itsa.traffic.element.TrafficObject;
@@ -29,10 +28,10 @@ import com.itsa.traffic.element.TrafficObject;
  * 
  * @author Alisson Oliveira
  * 
- * Updated on: Jan 03, 2015
+ * Updated on: Jan 07, 2015
  *
  */
-public class MapHandler implements OnMapReadyCallback {
+public class MapHandler {
 	
 	private GoogleMap map;
 	private SparseArray<Marker> objects;
@@ -41,16 +40,12 @@ public class MapHandler implements OnMapReadyCallback {
 		objects = new SparseArray<Marker>();
 	}
 	
+	public GoogleMap getMap() {
+		return map;
+	}
+	
 	public boolean hasMap() {
 		return map != null;
-	}
-
-
-	@Override
-	public void onMapReady(GoogleMap map) {
-		this.map = map;
-		map.animateCamera(CameraUpdateFactory.zoomTo(17));
-		map.setMyLocationEnabled(true);
 	}
 
 	public void go(Position currentPosition) {
@@ -71,6 +66,7 @@ public class MapHandler implements OnMapReadyCallback {
 	}
 	
 	public void removeObjects(SparseArray<? extends TrafficObject> trafficObjects) {
+		if(map == null) return;
 		for (int i = 0; i < trafficObjects.size(); i++) {
 			TrafficObject obj = trafficObjects.valueAt(i);
 			Marker marker = objects.get(obj.getId());
@@ -79,6 +75,7 @@ public class MapHandler implements OnMapReadyCallback {
 	}
 	
 	public void update(SparseArray<? extends TrafficObject> trafficObjects) {
+		if(map == null) return;
 		Log.i("Map", "updating " + trafficObjects.size());
 		for (int i = 0; i < trafficObjects.size(); i++) {
 			TrafficObject obj = trafficObjects.valueAt(i);
@@ -93,5 +90,11 @@ public class MapHandler implements OnMapReadyCallback {
 					objects.put(obj.getId(), marker);
 			}
 		}
+	}
+
+	public void setMap(GoogleMap map) {
+		this.map = map;
+		map.animateCamera(CameraUpdateFactory.zoomTo(17));
+		map.setMyLocationEnabled(true);
 	}
 }

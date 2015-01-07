@@ -21,7 +21,7 @@ import android.content.Context;
 import android.location.Location;
 import android.util.SparseArray;
 
-import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.GoogleMap;
 import com.itsa.conn.Manager;
 import com.itsa.conn.bluetooth.AndroidBluetoothConnection;
 import com.itsa.traffic.element.Car;
@@ -31,7 +31,7 @@ import com.itsa.traffic.element.Position;
  * 
  * @author Alisson Oliveira
  * 
- * Updated on: Jan 04, 2015
+ * Updated on: Jan 07, 2015
  *
  */
 public class TrafficManager implements Manager {
@@ -102,10 +102,6 @@ public class TrafficManager implements Manager {
 		return !mapHandler.hasMap();
 	}
 
-	public void initMap(SupportMapFragment fragment) {
-		fragment.getMapAsync(mapHandler);
-	}
-
 	public void setMapHandler(MapHandler mapHandler) {
 		if (mapHandler != null)
 			this.mapHandler = mapHandler;
@@ -140,7 +136,14 @@ public class TrafficManager implements Manager {
 
 	public void onDisconnection(AndroidBluetoothConnection conn) {
 		conectionHandler.finish();
-		
+	}
+	
+	public GoogleMap getMap() {
+		return mapHandler.getMap();
+	}
+
+	public void setMap(GoogleMap map) {
+		mapHandler.setMap(map);
 	}
 
 }
