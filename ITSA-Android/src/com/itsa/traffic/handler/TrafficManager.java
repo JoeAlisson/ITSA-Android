@@ -43,14 +43,20 @@ public class TrafficManager implements Manager {
 	private Context context;
 	private Position currentPosition;
 	private boolean trackingPosition = true;
+	private Speech speech;
 	
 
 	public TrafficManager(Context ctx) {
 		this.context = ctx;
+		speech = new Speech(ctx);
 		this.mapHandler = new MapHandler();
 		this.locationHandler = new LocationHandler(context, this);
 		this.conectionHandler = new ConnectionHandler(this);
 		cars = new SparseArray<Car>();
+	}
+	
+	public void report(String text) {
+		speech.speak(text);
 	}
 
 	public void addCar(Car car) {

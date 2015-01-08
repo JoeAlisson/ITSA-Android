@@ -123,6 +123,7 @@ public class MainActivity extends ActionBarActivity implements OnMapReadyCallbac
 			
 			@Override
 			public void onMapLongClick(LatLng arg0) {
+				trafficManager.report("Aonde vamos?");
 				displaySpeechRecognizer();
 			}
 		});
