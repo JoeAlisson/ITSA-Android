@@ -16,9 +16,11 @@
 package com.itsa.traffic.handler;
 
 import java.io.IOException;
+import java.util.List;
 
 import android.content.Context;
 import android.location.Location;
+import android.util.Log;
 import android.util.SparseArray;
 
 import com.google.android.gms.maps.GoogleMap;
@@ -26,16 +28,20 @@ import com.itsa.conn.Manager;
 import com.itsa.conn.bluetooth.AndroidBluetoothConnection;
 import com.itsa.traffic.element.Car;
 import com.itsa.traffic.element.Position;
+import com.itsa.traffic.voice.VoiceCommand;
+import com.itsa.traffic.voice.VoiceCommandHandler;
 
 /**
  * 
  * @author Alisson Oliveira
  * 
- * Updated on: Jan 07, 2015
+ * Updated on: Jan 10, 2015
  *
  */
-public class TrafficManager implements Manager {
-	private final long fogetTime = 5*60*1000; // 5 min 
+public class TrafficManager implements Manager, VoiceCommandHandler {
+	
+	
+	private final long forgetTime = 5*60*1000; // 5 min 
 	private SparseArray<Car> cars;
 	private MapHandler mapHandler;
 	private LocationHandler locationHandler;
@@ -43,22 +49,19 @@ public class TrafficManager implements Manager {
 	private Context context;
 	private Position currentPosition;
 	private boolean trackingPosition = true;
-	private Speech speech;
+	private VoiceCommand speech;
+	private int commandRequest = 0;
 	
 
 	public TrafficManager(Context ctx) {
 		this.context = ctx;
-		speech = new Speech(ctx);
+		speech = new VoiceCommand(ctx, this);
 		this.mapHandler = new MapHandler();
 		this.locationHandler = new LocationHandler(context, this);
 		this.conectionHandler = new ConnectionHandler(this);
 		cars = new SparseArray<Car>();
 	}
 	
-	public void report(String text) {
-		speech.speak(text);
-	}
-
 	public void addCar(Car car) {
 		cars.put(car.getId(), car);
 	}
@@ -67,7 +70,7 @@ public class TrafficManager implements Manager {
 		SparseArray<Car> toRemove = new SparseArray<Car>();
 		for (int i = 0; i < cars.size(); i++) {
 			Car c = cars.valueAt(i);
-			if((System.currentTimeMillis() - c.getLastModified()) > fogetTime) {
+			if((System.currentTimeMillis() - c.getLastModified()) > forgetTime) {
 				toRemove.put(c.getId(), c);
 				cars.remove(c.getId());
 				i--;
@@ -134,6 +137,7 @@ public class TrafficManager implements Manager {
 	public void destroy() {
 		stopLocationUpdates();
 		conectionHandler.onDestroy();
+		speech.stop();
 	}
 
 	public void connectToOmnet() throws IOException {
@@ -151,5 +155,38 @@ public class TrafficManager implements Manager {
 	public void setMap(GoogleMap map) {
 		mapHandler.setMap(map);
 	}
+	
+	
+	public void report(String text) {
+		speech.speak(text);
+	}
 
+	public void waitCommand() {
+		report("Aguardando Instruções");
+		speech.heard();
+	}
+
+	@Override
+	public void handleCommand(List<String> results) {
+		Log.i("Voice", "recognized " + results.size());
+		commandRequest = 0;
+		String text = results.get(0);
+		report(text);
+		
+		for (String string : results) {
+			text += " " + string;
+		}
+		Log.i("Voice", text);
+		
+	}
+
+	@Override
+	public void onVoiceCommandError(int error) {
+		if(commandRequest++ > 5 ) {
+			report("Cancelando Comando");
+			commandRequest = 0;
+			return;
+		}
+		waitCommand();
+	}
 }
