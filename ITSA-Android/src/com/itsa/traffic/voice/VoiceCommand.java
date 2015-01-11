@@ -76,6 +76,8 @@ public class VoiceCommand implements OnInitListener, RecognitionListener {
 		recognizer.stopListening();
 		recognizer.cancel();
 		recognizer.destroy();
+		tts.stop();
+		tts.shutdown();
 	}
 
 	@Override

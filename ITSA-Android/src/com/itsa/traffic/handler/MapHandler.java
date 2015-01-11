@@ -42,6 +42,7 @@ public class MapHandler {
 	
 	public GoogleMap getMap() {
 		return map;
+		
 	}
 	
 	public boolean hasMap() {

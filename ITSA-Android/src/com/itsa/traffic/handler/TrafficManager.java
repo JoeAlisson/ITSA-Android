@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.List;
 
 import android.content.Context;
+import android.location.Address;
 import android.location.Location;
 import android.util.Log;
 import android.util.SparseArray;
@@ -51,6 +52,8 @@ public class TrafficManager implements Manager, VoiceCommandHandler {
 	private boolean trackingPosition = true;
 	private VoiceCommand speech;
 	private int commandRequest = 0;
+	private boolean requestedDestination = false;
+	private String destination;
 	
 
 	public TrafficManager(Context ctx) {
@@ -80,12 +83,18 @@ public class TrafficManager implements Manager, VoiceCommandHandler {
 		mapHandler.update(cars);
 	}
 
+	
 	public void startLocationUpdates() {
 		locationHandler.start();
 	}
 
 	public void stopLocationUpdates() {
 		locationHandler.stop();
+	}
+	
+	public void setLocationHandler(LocationHandler locationHandler) {
+		if (locationHandler != null)
+			this.locationHandler = locationHandler;
 	}
 
 	public void handleChangePosition(Location location) {
@@ -106,6 +115,23 @@ public class TrafficManager implements Manager, VoiceCommandHandler {
 
 		conectionHandler.sendUpdatePosition(currentPosition);
 	}
+	
+	public void onReceiveAddress(List<Address> addresses) {
+		if(requestedDestination) {
+			requestedDestination = false;
+			for (Address address : addresses) {
+				destination = address.getSubAdminArea();
+				Log.i("Address", "destination " + destination);	
+			}
+			
+		}
+		
+	}
+	
+	public void onAddressRequestError() {
+		Log.i("Address", "Error Ocurred");
+		
+	}
 
 	public boolean needsMapSetup() {
 		return !mapHandler.hasMap();
@@ -114,11 +140,6 @@ public class TrafficManager implements Manager, VoiceCommandHandler {
 	public void setMapHandler(MapHandler mapHandler) {
 		if (mapHandler != null)
 			this.mapHandler = mapHandler;
-	}
-
-	public void setLocationHandler(LocationHandler locationHandler) {
-		if (locationHandler != null)
-			this.locationHandler = locationHandler;
 	}
 
 	public void setConnectionHandler(ConnectionHandler connectionHandler) {
@@ -161,8 +182,9 @@ public class TrafficManager implements Manager, VoiceCommandHandler {
 		speech.speak(text);
 	}
 
-	public void waitCommand() {
-		report("Aguardando Instruções");
+	public void waitCommand(boolean report) {
+		if(report)
+			report("Aguardando Instruções");
 		speech.heard();
 	}
 
@@ -170,13 +192,18 @@ public class TrafficManager implements Manager, VoiceCommandHandler {
 	public void handleCommand(List<String> results) {
 		Log.i("Voice", "recognized " + results.size());
 		commandRequest = 0;
-		String text = results.get(0);
-		report(text);
-		
-		for (String string : results) {
-			text += " " + string;
+		String command = results.get(0);
+		report(command);
+		Log.i("Command", command);
+		if(command.startsWith("ir para")) {
+			Log.i("Location Request", "requesting");
+			String toWhere = command.substring(7);
+			if(toWhere.equalsIgnoreCase("")) {
+				return;
+			}
+			locationHandler.requestAddressFromName(toWhere);
+			requestedDestination = true;
 		}
-		Log.i("Voice", text);
 		
 	}
 
@@ -187,6 +214,6 @@ public class TrafficManager implements Manager, VoiceCommandHandler {
 			commandRequest = 0;
 			return;
 		}
-		waitCommand();
+		waitCommand((commandRequest % 2) == 0);
 	}
 }

@@ -16,6 +16,8 @@
 package com.itsa.traffic;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -25,6 +27,7 @@ import com.itsa.traffic.handler.TrafficManager;
 
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -43,17 +46,20 @@ public class MainActivity extends ActionBarActivity implements OnMapReadyCallbac
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		Log.i("Event", "On Create");
 		setContentView(R.layout.activity_main);
 		
 	}
 	
 	@Override
 	protected void onResume() {
+		Log.i("Event", "On Resume");
 		trafficManager = new TrafficManager(this);
 		if(trafficManager.needsMapSetup()) {
 			((SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map)).getMapAsync(this);
 		}
 		trafficManager.resume();
+		
 		super.onResume();
 	}
 
@@ -65,7 +71,14 @@ public class MainActivity extends ActionBarActivity implements OnMapReadyCallbac
 	}
 	
 	@Override
+	protected void onPause() {
+		Log.i("Event", "OnPause");
+		super.onPause();
+	}
+	
+	@Override
 	protected void onDestroy() {
+		Log.i("Event", "OnDestroy");
 		trafficManager.destroy();
 		trafficManager = null;
 		super.onDestroy();
@@ -86,6 +99,12 @@ public class MainActivity extends ActionBarActivity implements OnMapReadyCallbac
 			} catch (IOException e) {
 				Toast.makeText(this, "couldn't connect ", Toast.LENGTH_SHORT).show();;
 			}
+			break;
+		case R.id.action_goto:
+			List<String> ls = new ArrayList<String>();
+			ls.add("ir para Samaritana");
+			trafficManager.handleCommand(ls);
+			break;
 		default:
 			break;
 		}
@@ -98,7 +117,7 @@ public class MainActivity extends ActionBarActivity implements OnMapReadyCallbac
 			
 			@Override
 			public void onMapLongClick(LatLng arg0) {
-				trafficManager.waitCommand();
+				trafficManager.waitCommand(true);
 			}
 		});
 		trafficManager.setMap(map);

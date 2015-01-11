@@ -439,6 +439,7 @@ int id action_bar_subtitle 0x7f0c0033
 int id action_bar_title 0x7f0c0032
 int id action_connect 0x7f0c0055
 int id action_context_bar 0x7f0c0046
+int id action_goto 0x7f0c0056
 int id action_menu_divider 0x7f0c0005
 int id action_menu_presenter 0x7f0c0006
 int id action_mode_bar 0x7f0c0042
@@ -564,6 +565,7 @@ int string abc_shareactionprovider_share_with_application 0x7f070031
 int string abc_toolbar_collapse_description 0x7f070027
 int string accept 0x7f070002
 int string action_connect 0x7f070036
+int string action_goto 0x7f070037
 int string action_settings 0x7f070035
 int string app_name 0x7f070033
 int string common_android_wear_notification_needs_update_text 0x7f070009

@@ -15,4 +15,11 @@
         app:showAsAction="never"
         android:title="@string/action_connect"
      />
+     
+     <item
+        android:id="@+id/action_goto"
+        android:orderInCategory="100"
+        app:showAsAction="never"
+        android:title="@string/action_goto"
+     />
 </menu>

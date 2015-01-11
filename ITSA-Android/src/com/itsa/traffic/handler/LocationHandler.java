@@ -1,6 +1,12 @@
 package com.itsa.traffic.handler;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
+
 import android.content.Context;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,12 +20,12 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
-public class LocationHandler implements LocationListener, ConnectionCallbacks,
-		OnConnectionFailedListener {
+public class LocationHandler implements LocationListener, ConnectionCallbacks, OnConnectionFailedListener {
 
 	private GoogleApiClient mGoogleApiClient;
 	private Context context;
 	private LocationRequest mLocationRequest;
+	private Geocoder geocoder;
 	private TrafficManager manager;
 
 	public LocationHandler(Context context, TrafficManager trafficManager) {
@@ -27,6 +33,7 @@ public class LocationHandler implements LocationListener, ConnectionCallbacks,
 		this.manager = trafficManager;
 		buildGoogleApiClient();
 		createLocationRequest();
+		geocoder = new Geocoder(context, Locale.getDefault());   
 	}
 
 	protected void buildGoogleApiClient() {
@@ -52,12 +59,7 @@ public class LocationHandler implements LocationListener, ConnectionCallbacks,
 	}
 
 	public void stop() {
-		LocationServices.FusedLocationApi.removeLocationUpdates(
-				mGoogleApiClient, this);
-	}
-
-	protected void changePosition(Location location) {
-
+		LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
 	}
 
 	@Override
@@ -69,27 +71,37 @@ public class LocationHandler implements LocationListener, ConnectionCallbacks,
 	@Override
 	public void onConnected(Bundle bundle) {
 		Log.i("PLAY SERVICE", "Connected");
-		changePosition(LocationServices.FusedLocationApi
-				.getLastLocation(mGoogleApiClient));
 		startLocationUpdates();
 
 	}
 
 	protected void startLocationUpdates() {
-		LocationServices.FusedLocationApi.requestLocationUpdates(
-				mGoogleApiClient, mLocationRequest, this);
+		LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
 	}
 
 	@Override
 	public void onConnectionSuspended(int arg0) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void onConnectionFailed(ConnectionResult arg0) {
-		// TODO Auto-generated method stub
 
+	}
+
+	public void requestAddressFromName(final String location) {
+		Log.i("Location", "Requesting " + location);
+		(new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					List<Address> address = geocoder.getFromLocationName(location, 5);
+					manager.onReceiveAddress(address);
+				} catch (IOException e) {
+					manager.onAddressRequestError();
+				}
+			}
+		})).start();
 	}
 
 }
