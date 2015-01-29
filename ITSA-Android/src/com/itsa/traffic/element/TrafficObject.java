@@ -19,23 +19,24 @@ package com.itsa.traffic.element;
  * 
  * @author Alisson Oliveira
  * 
- * Update on: Jan 04, 2015
+ * Update on: Jan 27, 2015
  *
  */
 public abstract class TrafficObject {
 
 	protected Position pos;
-	protected ObjectType type = ObjectType.DUMMY;
+	protected Services type = Services.NONE;
 	protected int id;
 	private String title;
 	private String description;
 	private long lastModified;
 
-	public TrafficObject(int id, double latitude, double longitude, String title, String description) {
+	public TrafficObject(int id, double latitude, double longitude, int service, String serviceContext) {
 		this.id = id;
 		this.pos = new Position(latitude, longitude);
-		this.title = title;
-		this.description = description;
+		this.type = Services.getService(service);
+		title = type == Services.NONE ? "Car" : type.name();
+		this.description = serviceContext == "" ? "Car " + id : serviceContext + " " + id;
 		lastModified = System.currentTimeMillis();
 	}
 	

@@ -25,8 +25,11 @@ import com.itsa.conn.bluetooth.AndroidBluetoothConnection;
 import com.itsa.conn.packet.ReadablePacket;
 import com.itsa.traffic.element.Position;
 import com.itsa.traffic.packet.R_InitPacket;
+import com.itsa.traffic.packet.R_RoutePacket;
+import com.itsa.traffic.packet.R_VehiclePacket;
 import com.itsa.traffic.packet.R_WSMPacket;
 import com.itsa.traffic.packet.W_PositionUpdate;
+
 
 /**
  * 
@@ -75,6 +78,12 @@ public class ConnectionHandler extends PacketReader<AndroidBluetoothConnection, 
 			break;
 		case R_WSMPacket.OPCODE:
 			packet = new R_WSMPacket();
+			break;
+		case R_VehiclePacket.OPCODE:
+			packet = new R_VehiclePacket();
+			break;
+		case R_RoutePacket.OPCODE:
+			packet = new R_RoutePacket();
 			break;
 		default:
 			Log.e("Connection Handler", "No handler to opcode received " + Integer.toHexString(opcode));

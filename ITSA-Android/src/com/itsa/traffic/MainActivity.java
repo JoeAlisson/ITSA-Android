@@ -26,10 +26,13 @@ import com.google.android.gms.maps.model.LatLng;
 import com.itsa.traffic.handler.TrafficManager;
 
 import android.support.v7.app.ActionBarActivity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
 import android.widget.Toast;
 
 /**
@@ -101,9 +104,26 @@ public class MainActivity extends ActionBarActivity implements OnMapReadyCallbac
 			}
 			break;
 		case R.id.action_goto:
-			List<String> ls = new ArrayList<String>();
-			ls.add("ir para Samaritana");
-			trafficManager.handleCommand(ls);
+			final EditText input = new EditText(this);
+			AlertDialog.Builder b = new AlertDialog.Builder(this);
+			b.setMessage("Digite o Destino ('Rua x' ou 'Bairro y')").setTitle("Ir Para").setView(input).
+			setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					String text = input.getText().toString();
+					List<String> ls = new ArrayList<String>();
+					ls.add("ir para " + text);
+					trafficManager.handleCommand(ls);
+				}
+			}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					//do nothing
+				}
+			});
+			AlertDialog d = b.create();
+			d.show();
 			break;
 		default:
 			break;

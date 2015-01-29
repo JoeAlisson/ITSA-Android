@@ -17,6 +17,7 @@ package com.itsa.traffic.handler;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 import android.content.Context;
 import android.location.Address;
@@ -36,7 +37,7 @@ import com.itsa.traffic.voice.VoiceCommandHandler;
  * 
  * @author Alisson Oliveira
  * 
- * Updated on: Jan 10, 2015
+ * Updated on: Jan 28, 2015
  *
  */
 public class TrafficManager implements Manager, VoiceCommandHandler {
@@ -54,6 +55,7 @@ public class TrafficManager implements Manager, VoiceCommandHandler {
 	private int commandRequest = 0;
 	private boolean requestedDestination = false;
 	private String destination;
+	private String loc;
 	
 
 	public TrafficManager(Context ctx) {
@@ -100,9 +102,9 @@ public class TrafficManager implements Manager, VoiceCommandHandler {
 	public void handleChangePosition(Location location) {
 		if (location == null)
 			return;
-		if (currentPosition != null
-				&& currentPosition.getLatitude() == location.getLatitude()
-				&& currentPosition.getLongitude() == location.getLongitude())
+		
+		// give a offset of 10m because the imprecision of the GPS system
+		if (currentPosition != null && currentPosition.distanceTo(location) < 10)
 			return;
 
 		if (location instanceof Position) {
@@ -110,22 +112,41 @@ public class TrafficManager implements Manager, VoiceCommandHandler {
 		} else {
 			currentPosition = new Position(location);
 		}
-		if (trackingPosition)
+		if ( mapHandler != null && trackingPosition)
 			mapHandler.go(currentPosition);
 
 		conectionHandler.sendUpdatePosition(currentPosition);
 	}
 	
 	public void onReceiveAddress(List<Address> addresses) {
-		if(requestedDestination) {
-			requestedDestination = false;
-			for (Address address : addresses) {
-				destination = address.getSubAdminArea();
-				Log.i("Address", "destination " + destination);	
-			}
-			
+		if(addresses.size() < 1) {
+			return;
 		}
-		
+		if (requestedDestination) {
+			requestedDestination = false;
+			// TODO handler null sub locality
+			destination = addresses.get(0).getSubLocality();
+			if(destination == null || destination.equals("")) {
+				report("Localidade não encontrada");
+			} else {
+				report("Seu destino é " + destination);
+			}
+		}
+		for (Address address : addresses) {
+
+			Log.i("Address",
+					"destination: " + destination + "\nAddressLine: "
+							+ address.getAddressLine(0) + "\nAdminArea: "
+							+ address.getAdminArea() + "\nSubAdminArea: "
+							+ address.getSubAdminArea() + "\nCountry Name: "
+							+ address.getCountryName() + "\nFeature Name: "
+							+ address.getFeatureName() + "\nLocality: "
+							+ address.getLocality() + "\nSub Locality: "
+							+ address.getSubLocality() + "\nSub Thoroughfare: "
+							+ address.getSubThoroughfare() + "\nThroughfare: "
+							+ address.getThoroughfare() + "\nURL: "
+							+ address.getUrl() + "\n\n");
+		}
 	}
 	
 	public void onAddressRequestError() {
@@ -177,7 +198,6 @@ public class TrafficManager implements Manager, VoiceCommandHandler {
 		mapHandler.setMap(map);
 	}
 	
-	
 	public void report(String text) {
 		speech.speak(text);
 	}
@@ -201,10 +221,15 @@ public class TrafficManager implements Manager, VoiceCommandHandler {
 			if(toWhere.equalsIgnoreCase("")) {
 				return;
 			}
+			toWhere = toWhere.toLowerCase(Locale.getDefault()).contains("rua") ? toWhere + ", " + loc : "Bairro " + toWhere + ", " + loc;
 			locationHandler.requestAddressFromName(toWhere);
-			requestedDestination = true;
+			requestedDestination = true; 
+			
 		}
-		
+	}
+	
+	public String getRequestedDestination() {
+		return destination;
 	}
 
 	@Override
@@ -215,5 +240,21 @@ public class TrafficManager implements Manager, VoiceCommandHandler {
 			return;
 		}
 		waitCommand((commandRequest % 2) == 0);
+	}
+	
+	
+	public boolean isRequestingDestination() {
+		return requestedDestination;
+	}
+
+	public void setLocAddress(Address address) {
+		loc = address.getSubAdminArea() != null ? address.getSubAdminArea() : address.getLocality();
+		Log.i("LOCupdate", "em " + loc);
+		if (address.getSubLocality() != null && address.getSubLocality().equalsIgnoreCase(destination)) {
+			Log.i("Destination", "Chegou ao destino");
+			report("Você chegou ao seu destino");
+			destination = null;
+		}
+		
 	}
 }

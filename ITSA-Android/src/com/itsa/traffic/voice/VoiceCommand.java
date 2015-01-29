@@ -58,14 +58,14 @@ public class VoiceCommand implements OnInitListener, RecognitionListener {
 		}
 	}
 	
+	@SuppressWarnings("deprecation")
 	public void speak(String text) {
-		tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+		tts.speak(text, TextToSpeech.QUEUE_ADD, null);
 	}
 
 	public void heard() {
 		Intent recognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-        // accept partial results if they come
         recognizerIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE,  getClass().getPackage().getName());
         recognizerIntent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 15000);
         recognizer.startListening(recognizerIntent);

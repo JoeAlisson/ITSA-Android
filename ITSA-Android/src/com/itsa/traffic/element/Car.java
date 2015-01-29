@@ -16,6 +16,7 @@
 package com.itsa.traffic.element;
 
 /**
+ * Updated on: Jan 27, 2015
  * 
  * @author Alisson Oliveira
  *
@@ -26,11 +27,11 @@ public class Car extends TrafficObject {
 	
 	
 	public Car(int id, double latitude, double longitude) {
-		this(id,latitude,longitude,"Car: " + id, "Car");
+		this(id,latitude,longitude,0,"");
 	}
 
-	public Car(int id, double latitude, double longitude, String title, String description) {
-		super(id, latitude, longitude, title, description);
+	public Car(int id, double latitude, double longitude, int service, String description) {
+		super(id, latitude, longitude, service, description);
 		this.needUpdate = true;
 	}
 	
