@@ -9,8 +9,8 @@ import com.itsa.conn.packet.ReadablePacket;
  * @author Alisson Oliveira
  *
  */
-public interface PacketListener<T extends Connection, M extends Manager>  {
+public interface PacketListener<M extends Manager>  {
 	
-	public void  processPacket(ReadablePacket<T, M> packet, M manager);
+	public void  processPacket(ReadablePacket<M> packet, M manager);
 
 }

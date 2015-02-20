@@ -4,9 +4,9 @@ import java.nio.ByteBuffer;
 
 import com.itsa.conn.Connection;
 
-public interface WritablePacket<T extends Connection>{
+public interface WritablePacket{
 	
-	public void write(T conn, ByteBuffer buffer);
+	public void write(Connection conn, ByteBuffer buffer);
 	
 	public short getOpcode();
 

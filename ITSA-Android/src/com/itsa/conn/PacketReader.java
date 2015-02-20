@@ -31,22 +31,21 @@ import android.util.Log;
  * Updated on: Jan 03, 2015
  * 	
  *
- * @param <C>
  * @param <M>
  */
-public abstract class PacketReader<C extends Connection, M extends Manager> implements Runnable {
+public abstract class PacketReader<M extends Manager> implements Runnable {
 
-	protected C con;
-	private PacketListener<C, M> pListener;
-	protected final ConcurrentLinkedQueue<ReadablePacket<C, M>> queue;
+	protected Connection con;
+	private PacketListener<M> pListener;
+	protected final ConcurrentLinkedQueue<ReadablePacket<M>> queue;
 	private boolean running;
 	private ReentrantLock lock;
 	protected M manager;
 	
-	public PacketReader(C con, M manager) {
+	public PacketReader(Connection con, M manager) {
 		this.con = con;
 		this.manager = manager;
-		queue = new ConcurrentLinkedQueue<ReadablePacket<C, M>>();
+		queue = new ConcurrentLinkedQueue<ReadablePacket<M>>();
 		lock = new ReentrantLock();
 	}
 
@@ -59,7 +58,7 @@ public abstract class PacketReader<C extends Connection, M extends Manager> impl
 				ByteBuffer buf = con.read();
 				if (buf != null) {
 					short opcode = buf.getShort();
-					ReadablePacket<C, M> packet = createPacket(opcode);
+					ReadablePacket<M> packet = createPacket(opcode);
 					if (packet != null) {
 						packet.read(con, buf);
 						queue.add(packet);
@@ -97,9 +96,9 @@ public abstract class PacketReader<C extends Connection, M extends Manager> impl
 		con.handleDisconnection();
 	}
 
-	protected abstract ReadablePacket<C, M> createPacket(short opcode);
+	protected abstract ReadablePacket<M> createPacket(short opcode);
 	
-	public void setPacketListener(PacketListener<C, M> pListiner) {
+	public void setPacketListener(PacketListener<M> pListiner) {
 		this.pListener = pListiner;
 		handlerPackets();
 	}

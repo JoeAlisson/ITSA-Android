@@ -22,7 +22,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
-import com.itsa.conn.bluetooth.AndroidBluetoothConnection;
+import com.itsa.conn.Connection;
 import com.itsa.traffic.element.Car;
 import com.itsa.traffic.element.Position;
 import com.itsa.traffic.handler.TrafficManager;
@@ -44,7 +44,7 @@ public class R_RoutePacket extends R_VehiclePacket {
 	 * @see com.itsa.conn.packet.ReadablePacket#read(com.itsa.conn.Connection, java.nio.ByteBuffer)
 	 */
 	@Override
-	public void read(AndroidBluetoothConnection conn, ByteBuffer buf) {
+	public void read(Connection conn, ByteBuffer buf) {
 		super.read(conn, buf);
 		route = readString(buf);
 	}
@@ -53,7 +53,7 @@ public class R_RoutePacket extends R_VehiclePacket {
 	 * @see com.itsa.conn.packet.ReadablePacket#process(com.itsa.conn.Connection, com.itsa.conn.Manager)
 	 */
 	@Override
-	public void process(AndroidBluetoothConnection conn, final TrafficManager manager) {
+	public void process(Connection conn, final TrafficManager manager) {
 		manager.addCar(new Car(id, latitude, longitude, service, serviceContext));
 		(new Handler(Looper.getMainLooper())).post(new Runnable() {
 			

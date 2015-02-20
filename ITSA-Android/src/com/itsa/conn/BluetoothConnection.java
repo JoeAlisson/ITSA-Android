@@ -46,7 +46,7 @@ public abstract class BluetoothConnection<T> extends Connection {
 	 * @param device
 	 * @throws IOException
 	 */
-	public abstract void connect(T device, int porta) throws IOException;
+	public abstract void connect(T device, int port) throws IOException;
 	
 	/**
 	 * 

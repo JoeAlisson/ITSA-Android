@@ -2,14 +2,15 @@ package com.itsa.traffic.packet;
 
 import java.nio.ByteBuffer;
 
-import com.itsa.conn.bluetooth.AndroidBluetoothConnection;
+import com.itsa.conn.Connection;
+import com.itsa.conn.packet.AbstractWritablePacket;
 import com.itsa.traffic.element.Position;
 
 /**
  * @author Alisson Oliveira
  *
  */
-public class W_PositionUpdate extends WritableTrafficPacket {
+public class W_PositionUpdate extends AbstractWritablePacket {
 
 	
 	private Position position;
@@ -22,7 +23,7 @@ public class W_PositionUpdate extends WritableTrafficPacket {
 	 * @see com.itsa.conn.packet.WritablePacket#write(com.itsa.conn.Connection, java.nio.ByteBuffer)
 	 */
 	@Override
-	public void write(AndroidBluetoothConnection conn, ByteBuffer buffer) {
+	public void write(Connection conn, ByteBuffer buffer) {
 		buffer.putDouble(position.getLatitude());
 		buffer.putDouble(position.getLongitude());
 		buffer.putDouble(position.getAltitude());

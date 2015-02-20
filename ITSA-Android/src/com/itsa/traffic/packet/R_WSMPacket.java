@@ -21,7 +21,8 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
-import com.itsa.conn.bluetooth.AndroidBluetoothConnection;
+import com.itsa.conn.Connection;
+import com.itsa.conn.packet.AbstractReadablePacket;
 import com.itsa.traffic.element.Car;
 import com.itsa.traffic.handler.TrafficManager;
 
@@ -31,7 +32,7 @@ import com.itsa.traffic.handler.TrafficManager;
  * Updated on: Jan 03, 2015
  *
  */
-public class R_WSMPacket extends ReadableTrafficPacket {
+public class R_WSMPacket extends AbstractReadablePacket<TrafficManager> {
 
 	final public static short OPCODE = 0x01;
 	private String name;
@@ -56,7 +57,7 @@ public class R_WSMPacket extends ReadableTrafficPacket {
 	 * @see com.itsa.conn.packet.ReadablePacket#read(com.itsa.conn.Connection, java.nio.ByteBuffer)
 	 */
 	@Override
-	public void read(AndroidBluetoothConnection conn, ByteBuffer buf) {
+	public void read(Connection conn, ByteBuffer buf) {
 		name = readString(buf);
 		kind = buf.getShort();
 		version = buf.getInt();
@@ -82,7 +83,7 @@ public class R_WSMPacket extends ReadableTrafficPacket {
 	 * @see com.itsa.conn.packet.ReadablePacket#process(com.itsa.conn.Connection, com.itsa.conn.Manager)
 	 */
 	@Override
-	public void process(AndroidBluetoothConnection conn, final TrafficManager manager) {
+	public void process(Connection conn, final TrafficManager manager) {
 		Log.i("VANET", "WSMessage: "
 				+ "\nname: " + name
 				+ "\nkind " + kind

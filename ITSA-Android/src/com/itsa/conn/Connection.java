@@ -78,13 +78,12 @@ public abstract class Connection {
 	 * @throws IOException
 	 *             - if something in connection goes wrong.
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public final void sendPacket(WritablePacket packet) throws IOException {
 		if (packet == null || !isConnected()) {
 			return;
 		}
 
-		Log.i("Connection ", "Sending " + packet.getOpcode());
+		Log.i("Connection ", "Sending OPCODE " + packet.getOpcode());
 		synchronized (writerBuffer) {
 			writerBuffer.clear();
 			// reserve space for the size
@@ -163,4 +162,6 @@ public abstract class Connection {
 	public abstract boolean isConnected();
 
 	public abstract String getAddress();
+
+	public abstract void connect(String address, int port) throws IOException;
 }

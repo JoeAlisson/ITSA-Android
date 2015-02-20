@@ -19,9 +19,9 @@ import java.io.IOException;
 
 import android.util.Log;
 
+import com.itsa.conn.Connection;
 import com.itsa.conn.PacketListener;
 import com.itsa.conn.PacketReader;
-import com.itsa.conn.bluetooth.AndroidBluetoothConnection;
 import com.itsa.conn.packet.ReadablePacket;
 import com.itsa.traffic.element.Position;
 import com.itsa.traffic.packet.R_InitPacket;
@@ -30,48 +30,46 @@ import com.itsa.traffic.packet.R_VehiclePacket;
 import com.itsa.traffic.packet.R_WSMPacket;
 import com.itsa.traffic.packet.W_PositionUpdate;
 
-
 /**
  * 
  * @author Alisson Oliveira
  * 
- * Update on: Jan 02, 2015
+ *   Update on: Jan 02, 2015
  *
  */
-public class ConnectionHandler extends PacketReader<AndroidBluetoothConnection, TrafficManager> implements PacketListener<AndroidBluetoothConnection, TrafficManager> {
+public class ConnectionHandler extends PacketReader<TrafficManager> implements PacketListener<TrafficManager> {
 
-	public ConnectionHandler(TrafficManager trafficManager) {
-		super(new AndroidBluetoothConnection(), trafficManager);
+	public ConnectionHandler(Connection con, TrafficManager trafficManager) {
+		super(con, trafficManager);
 		setPacketListener(this);
 	}
 
-	public void connect() throws IOException {
-		connectTo("14:2D:27:CD:A5:68");
-	}
-	
-	public void connectTo(String address) throws IOException {
+	public void connect(String address, int port) throws IOException {
 		if(con.isConnected()) return;
-		con.connect(address);
+		con.connect(address, port);
 		(new Thread(this)).start();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.itsa.conn.PacketListener#processPacket(com.itsa.conn.packet.ReadablePacket, com.itsa.conn.Manager)
+	 * 
+	 * @see com.itsa.conn.PacketListener#processPacket(com.itsa.conn.packet.
+	 * ReadablePacket, com.itsa.conn.Manager)
 	 */
 	@Override
-	public void processPacket(ReadablePacket<AndroidBluetoothConnection, TrafficManager> packet, TrafficManager manager) {
+	public void processPacket(ReadablePacket<TrafficManager> packet, TrafficManager manager) {
 		packet.process(con, manager);
 	}
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see com.itsa.conn.PacketReader#createPacket(short)
 	 */
 	@Override
-	protected ReadablePacket<AndroidBluetoothConnection, TrafficManager> createPacket(short opcode) {
+	protected ReadablePacket<TrafficManager> createPacket(short opcode) {
 		Log.i("Connection Handler", "Opcode received " + Integer.toHexString(opcode));
-		ReadablePacket<AndroidBluetoothConnection, TrafficManager> packet = null;
+		ReadablePacket<TrafficManager> packet = null;
 		switch (opcode) {
 		case R_InitPacket.OPCODE:
 			packet = new R_InitPacket();
@@ -91,15 +89,12 @@ public class ConnectionHandler extends PacketReader<AndroidBluetoothConnection, 
 		}
 		return packet;
 	}
-	
-	
+
 	public void sendUpdatePosition(Position currentPosition) {
-		if(con.canSend()){
-			try {
-				con.sendPacket(new W_PositionUpdate(currentPosition));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+		try {
+			con.sendPacket(new W_PositionUpdate(currentPosition));
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 

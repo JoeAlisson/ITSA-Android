@@ -47,7 +47,7 @@ public class TrafficManager implements Manager, VoiceCommandHandler {
 	private SparseArray<Car> cars;
 	private MapHandler mapHandler;
 	private LocationHandler locationHandler;
-	private ConnectionHandler conectionHandler;
+	private ConnectionHandler connectionHandler;
 	private Context context;
 	private Position currentPosition;
 	private boolean trackingPosition = true;
@@ -63,7 +63,6 @@ public class TrafficManager implements Manager, VoiceCommandHandler {
 		speech = new VoiceCommand(ctx, this);
 		this.mapHandler = new MapHandler();
 		this.locationHandler = new LocationHandler(context, this);
-		this.conectionHandler = new ConnectionHandler(this);
 		cars = new SparseArray<Car>();
 	}
 	
@@ -114,8 +113,8 @@ public class TrafficManager implements Manager, VoiceCommandHandler {
 		}
 		if ( mapHandler != null && trackingPosition)
 			mapHandler.go(currentPosition);
-
-		conectionHandler.sendUpdatePosition(currentPosition);
+		if(connectionHandler != null)
+			connectionHandler.sendUpdatePosition(currentPosition);
 	}
 	
 	public void onReceiveAddress(List<Address> addresses) {
@@ -165,7 +164,7 @@ public class TrafficManager implements Manager, VoiceCommandHandler {
 
 	public void setConnectionHandler(ConnectionHandler connectionHandler) {
 		if (connectionHandler != null)
-			this.conectionHandler = connectionHandler;
+			this.connectionHandler = connectionHandler;
 	}
 	
 	public Position getCurrentPosition() {
@@ -178,16 +177,17 @@ public class TrafficManager implements Manager, VoiceCommandHandler {
 
 	public void destroy() {
 		stopLocationUpdates();
-		conectionHandler.onDestroy();
+		connectionHandler.onDestroy();
 		speech.stop();
 	}
 
 	public void connectToOmnet() throws IOException {
-		conectionHandler.connect();
+		connectionHandler = new ConnectionHandler(new AndroidBluetoothConnection(), this);
+		connectionHandler.connect("14:2D:27:CD:A5:68", 1);
 	}
 
 	public void onDisconnection(AndroidBluetoothConnection conn) {
-		conectionHandler.finish();
+		connectionHandler.finish();
 	}
 	
 	public GoogleMap getMap() {

@@ -12,10 +12,10 @@ import com.itsa.conn.Manager;
  * @author Alisson Oliveira
  *
  */
-public interface ReadablePacket<C extends Connection, M extends Manager> {
+public interface ReadablePacket<M extends Manager> {
 	
-	void read(C conn, ByteBuffer buf);
+	void read(Connection conn, ByteBuffer buf);
 	
-	void process(C conn, M manager);
+	void process(Connection conn, M manager);
 
 }

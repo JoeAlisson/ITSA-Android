@@ -9,7 +9,8 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
-import com.itsa.conn.bluetooth.AndroidBluetoothConnection;
+import com.itsa.conn.Connection;
+import com.itsa.conn.packet.AbstractReadablePacket;
 import com.itsa.traffic.element.Car;
 import com.itsa.traffic.handler.TrafficManager;
 
@@ -19,7 +20,7 @@ import com.itsa.traffic.handler.TrafficManager;
  * @author Alisson Oliveira
  *
  */
-public class R_VehiclePacket extends ReadableTrafficPacket {
+public class R_VehiclePacket extends AbstractReadablePacket<TrafficManager> {
 	
 	public static final short OPCODE = 0x03;
 	
@@ -34,7 +35,7 @@ public class R_VehiclePacket extends ReadableTrafficPacket {
 	 * @see com.itsa.conn.packet.ReadablePacket#read(com.itsa.conn.Connection, java.nio.ByteBuffer)
 	 */
 	@Override
-	public void read(AndroidBluetoothConnection conn, ByteBuffer buf) {
+	public void read(Connection conn, ByteBuffer buf) {
 		id = buf.getInt();
 		service = buf.getInt();
 		serviceContext = readString(buf);
@@ -47,7 +48,7 @@ public class R_VehiclePacket extends ReadableTrafficPacket {
 	 * @see com.itsa.conn.packet.ReadablePacket#process(com.itsa.conn.Connection, com.itsa.conn.Manager)
 	 */
 	@Override
-	public void process(AndroidBluetoothConnection conn, final TrafficManager manager) {
+	public void process(Connection conn, final TrafficManager manager) {
 		Log.i("Vehicle", "service " + service);
 		manager.addCar(new Car(id, latitude, longitude, service, serviceContext));
 		(new Handler(Looper.getMainLooper())).post(new Runnable() {

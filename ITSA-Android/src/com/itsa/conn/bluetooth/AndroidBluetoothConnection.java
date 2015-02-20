@@ -38,7 +38,6 @@ public class AndroidBluetoothConnection extends	BluetoothConnection<BluetoothDev
 
 	private BluetoothAdapter adpter;
 	private boolean isConnected;
-	private boolean canSend = false;
 	
 	BluetoothSocket btSocket;
 	public AndroidBluetoothConnection() {
@@ -65,13 +64,18 @@ public class AndroidBluetoothConnection extends	BluetoothConnection<BluetoothDev
 	public void connect(String mac) throws IOException {
 		connect(adpter.getRemoteDevice(mac), 1);
 	}
+	
+	@Override
+	public void connect(String address, int port) throws IOException {
+		connect(adpter.getRemoteDevice(address), port);
+	}
 
 	@Override
-	public void connect(BluetoothDevice device, int porta) throws IOException {
+	public void connect(BluetoothDevice device, int port) throws IOException {
 		try {
 			Method m;
 			m = device.getClass().getMethod("createRfcommSocket", new Class[] { int.class });
-			btSocket = (BluetoothSocket) m.invoke(device, 1);
+			btSocket = (BluetoothSocket) m.invoke(device, port);
 			cancelDiscovery();
 			btSocket.connect();
 			output = btSocket.getOutputStream();
@@ -122,16 +126,6 @@ public class AndroidBluetoothConnection extends	BluetoothConnection<BluetoothDev
 		if(!isConnected) return;
 		Log.i("Connection", "handling Disconnection");
 		isConnected = false;
-		canSend = false;
 		close();
 	}
-	
-	public boolean canSend() {
-		return isConnected && canSend;
-	}
-	
-	public void canSend(boolean canSend) {
-		this.canSend = canSend;
-	}
-
 }
