@@ -31,7 +31,7 @@ import android.util.Log;
  * 
  * @author Alisson Oliveira
  * 
- *  Updated on: Jan 03, 2015
+ *         Updated on: Jan 03, 2015
  *
  */
 public abstract class Connection {
@@ -83,7 +83,6 @@ public abstract class Connection {
 			return;
 		}
 
-		Log.i("Connection ", "Sending OPCODE " + packet.getOpcode());
 		synchronized (writerBuffer) {
 			writerBuffer.clear();
 			// reserve space for the size
@@ -123,14 +122,12 @@ public abstract class Connection {
 		if (output != null) {
 			byte[] array = new byte[size];
 			buf.get(array);
-			Log.i("BT", "Sending " + size);
 			output.write(array);
 			output.flush();
 		}
 	}
 
 	public final ByteBuffer read() throws IOException {
-		Log.i("BT", "Trying to read");
 		byte[] array;
 		try {
 			readerBuffer.clear();
@@ -138,21 +135,22 @@ public abstract class Connection {
 				return null;
 
 			int length = input.read() | (input.read() << 8);
-			Log.i("BT", "waiting for the rest " + length);
 			array = new byte[length];
 			int received = 0;
 			do {
 				received += input.read(array, received, length - received);
-				Log.i("BT", "received " + received);
 			} while (received < length);
 		} catch (IOException e) {
 			handleDisconnection();
 			throw e;
-		} catch (Exception e) {
-			Log.e("Connection", "" + e);
+		} catch (NegativeArraySizeException e) {
+			handleDisconnection();
+			throw new IOException("Received negative size");
+		}
+		catch (Exception e) {
+			Log.e("Connection", "this error " + e);
 			return null;
 		}
-		Log.i("BT", "data fully received");
 		ByteBuffer buf = ByteBuffer.wrap(array).order(BYTE_ORDER);
 		return buf;
 	}
@@ -163,5 +161,4 @@ public abstract class Connection {
 
 	public abstract String getAddress();
 
-	public abstract void connect(String address, int port) throws IOException;
 }

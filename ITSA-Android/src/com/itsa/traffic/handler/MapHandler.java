@@ -50,7 +50,8 @@ public class MapHandler {
 	}
 
 	public void go(Position currentPosition) {
-		go(currentPosition, map.getCameraPosition().zoom);
+		if(map!= null)
+			go(currentPosition, map.getCameraPosition().zoom);
 	}
 
 	public void go(Position currentPosition, float zoom) {
@@ -62,7 +63,7 @@ public class MapHandler {
 	private Marker createMarker(TrafficObject object) {
 		if(map != null) {
 			return map.addMarker(object.getPosition().getMarker().title(object.getTitle()).snippet(object.getDescription()));
-		}
+		}	
 		return null;
 	}
 	

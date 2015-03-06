@@ -44,9 +44,9 @@ public class ConnectionHandler extends PacketReader<TrafficManager> implements P
 		setPacketListener(this);
 	}
 
-	public void connect(String address, int port) throws IOException {
-		if(con.isConnected()) return;
-		con.connect(address, port);
+	public void listen() {
+		if(con == null || !con.isConnected()) return;
+		Log.i("Connect", "linsting");
 		(new Thread(this)).start();
 	}
 

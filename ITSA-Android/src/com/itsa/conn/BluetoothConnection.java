@@ -35,14 +35,6 @@ public abstract class BluetoothConnection<T> extends Connection {
 	/**
 	 * Connect to a Device.
 	 * 
-	 * @param mac - The MAC Address of Device.
-	 * @throws IOException - if something goes wrong in connection.
-	 */
-	public abstract void connect(String mac) throws IOException;
-	
-	/**
-	 * Connect to a Device.
-	 * 
 	 * @param device
 	 * @throws IOException
 	 */

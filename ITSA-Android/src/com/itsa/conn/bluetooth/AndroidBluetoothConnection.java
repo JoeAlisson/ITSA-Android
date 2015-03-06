@@ -40,9 +40,10 @@ public class AndroidBluetoothConnection extends	BluetoothConnection<BluetoothDev
 	private boolean isConnected;
 	
 	BluetoothSocket btSocket;
-	public AndroidBluetoothConnection() {
+	public AndroidBluetoothConnection(String address, int port) throws IOException {
 		adpter = BluetoothAdapter.getDefaultAdapter();
 		isConnected = false;
+		connect(adpter.getRemoteDevice(address), port);
 	}
 	
 	@Override
@@ -58,16 +59,6 @@ public class AndroidBluetoothConnection extends	BluetoothConnection<BluetoothDev
 	@Override
 	public Set<BluetoothDevice> getPairedDevices() {
 		return adpter.getBondedDevices();
-	}
-
-	@Override
-	public void connect(String mac) throws IOException {
-		connect(adpter.getRemoteDevice(mac), 1);
-	}
-	
-	@Override
-	public void connect(String address, int port) throws IOException {
-		connect(adpter.getRemoteDevice(address), port);
 	}
 
 	@Override

@@ -26,6 +26,7 @@ import android.util.Log;
 import android.util.SparseArray;
 
 import com.google.android.gms.maps.GoogleMap;
+import com.itsa.conn.Connection;
 import com.itsa.conn.Manager;
 import com.itsa.conn.bluetooth.AndroidBluetoothConnection;
 import com.itsa.traffic.element.Car;
@@ -177,13 +178,14 @@ public class TrafficManager implements Manager, VoiceCommandHandler {
 
 	public void destroy() {
 		stopLocationUpdates();
-		connectionHandler.onDestroy();
+		if(connectionHandler != null)
+			connectionHandler.onDestroy();
 		speech.stop();
 	}
 
-	public void connectToOmnet() throws IOException {
-		connectionHandler = new ConnectionHandler(new AndroidBluetoothConnection(), this);
-		connectionHandler.connect("14:2D:27:CD:A5:68", 1);
+	public void connectToOmnet(Connection con) throws IOException {
+		connectionHandler = new ConnectionHandler(con, this);
+		connectionHandler.listen();
 	}
 
 	public void onDisconnection(AndroidBluetoothConnection conn) {

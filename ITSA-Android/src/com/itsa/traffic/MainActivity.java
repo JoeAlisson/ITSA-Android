@@ -23,13 +23,15 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.itsa.conn.Connection;
+import com.itsa.conn.InetConnection;
+import com.itsa.conn.bluetooth.AndroidBluetoothConnection;
 import com.itsa.traffic.handler.TrafficManager;
 
 import android.support.v7.app.ActionBarActivity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -45,24 +47,22 @@ import android.widget.Toast;
 public class MainActivity extends ActionBarActivity implements OnMapReadyCallback {
 
 	private TrafficManager trafficManager;
+	private boolean useBluetooth = false;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		Log.i("Event", "On Create");
 		setContentView(R.layout.activity_main);
 		
 	}
 	
 	@Override
 	protected void onResume() {
-		Log.i("Event", "On Resume");
 		trafficManager = new TrafficManager(this);
 		if(trafficManager.needsMapSetup()) {
 			((SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map)).getMapAsync(this);
 		}
 		trafficManager.resume();
-		
 		super.onResume();
 	}
 
@@ -72,17 +72,12 @@ public class MainActivity extends ActionBarActivity implements OnMapReadyCallbac
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
-	
-	@Override
-	protected void onPause() {
-		Log.i("Event", "OnPause");
-		super.onPause();
-	}
+
 	
 	@Override
 	protected void onDestroy() {
-		Log.i("Event", "OnDestroy");
-		trafficManager.destroy();
+		if(trafficManager != null)
+			trafficManager.destroy();
 		trafficManager = null;
 		super.onDestroy();
 	}
@@ -92,16 +87,50 @@ public class MainActivity extends ActionBarActivity implements OnMapReadyCallbac
 		// Handle action bar item clicks here. The action bar will
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
+		
+		/*NotificationCompat.Builder notBuilder = new NotificationCompat.Builder(this).
+				setSmallIcon(R.drawable.abc_ic_menu_share_mtrl_alpha).
+				setContentTitle("Traffic Message").setContentText("Opening");
+		//Intent resultIntent = new Intent(this, MainActivity.class);
+
+		// The stack builder object will contain an artificial back stack for the
+		// started Activity.
+		// This ensures that navigating backward from the Activity leads out of
+		// your application to the Home screen.
+		//TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+		// Adds the back stack for the Intent (but not the Intent itself)
+		//stackBuilder.addParentStack(MainActivity.class);
+		// Adds the Intent that starts the Activity to the top of the stack
+		//stackBuilder.addNextIntent(resultIntent);
+		PendingIntent resultPendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, new Intent(), PendingIntent.FLAG_UPDATE_CURRENT);
+		     
+		notBuilder.setContentIntent(resultPendingIntent);
+		NotificationManager nmn = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+		Notification not = notBuilder.build();
+		not.defaults |= Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE;
+		nmn.notify(1, not);*/
 		int id = item.getItemId();
 		switch (id) {
 		case R.id.action_settings:
 			return true;
 		case R.id.action_connect:
-			try {
-				trafficManager.connectToOmnet();
-			} catch (IOException e) {
-				Toast.makeText(this, "couldn't connect ", Toast.LENGTH_SHORT).show();;
-			}
+			new Thread(new Runnable() {
+				public void run() {
+					try {
+						Connection con = null;
+						if (useBluetooth) {
+							con = new AndroidBluetoothConnection("14:2D:27:CD:A5:68", 1);
+						} else {
+							con = new InetConnection("192.168.0.103", 3736);
+						}
+						trafficManager.connectToOmnet(con);
+					} catch (IOException e) {
+						Toast.makeText(getApplicationContext(),
+								"couldn't connect ", Toast.LENGTH_SHORT).show();
+					}
+				}
+			}).start();
+
 			break;
 		case R.id.action_goto:
 			final EditText input = new EditText(this);
