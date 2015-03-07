@@ -23,9 +23,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 
-import com.google.android.gms.internal.lg;
 import com.itsa.conn.Connection;
 import com.itsa.conn.packet.AbstractReadablePacket;
 import com.itsa.traffic.R;
@@ -56,8 +54,6 @@ public class R_NotificationPacket extends AbstractReadablePacket<TrafficManager>
 		service = buf.getInt();
 		serviceContext = readString(buf);
 		data = readString(buf);
-		Log.i("READ",data);
-
 	}
 
 	/* (non-Javadoc)

@@ -32,6 +32,9 @@ import android.support.v7.app.ActionBarActivity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -100,12 +103,18 @@ public class MainActivity extends ActionBarActivity implements OnMapReadyCallbac
 						if (useBluetooth) {
 							con = new AndroidBluetoothConnection("14:2D:27:CD:A5:68", 1);
 						} else {
-							con = new InetConnection("192.168.0.103", 3736);
+							con = new InetConnection("192.168.0.110", 3736);
 						}
 						trafficManager.connectToOmnet(con);
 					} catch (IOException e) {
-						Toast.makeText(getApplicationContext(),
-								"couldn't connect ", Toast.LENGTH_SHORT).show();
+						Log.i("COnnect", e.getMessage());
+						(new Handler(Looper.getMainLooper())).post(new Runnable() {
+							@Override
+							public void run() {
+								Toast.makeText(getApplicationContext(),
+										"couldn't connect ", Toast.LENGTH_SHORT).show();
+							}
+						});
 					}
 				}
 			}).start();

@@ -71,7 +71,8 @@ public abstract class PacketReader<M extends Manager> implements Runnable {
 
 	public void finish() {
 		running = false;
-		con.handleDisconnection();
+		if(con != null)
+			con.handleDisconnection();
 	}
 
 	protected abstract ReadablePacket<M> createPacket(short opcode);
