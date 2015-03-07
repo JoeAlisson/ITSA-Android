@@ -17,60 +17,67 @@ package com.itsa.traffic.packet;
 
 import java.nio.ByteBuffer;
 
-import android.os.Handler;
-import android.os.Looper;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import com.google.android.gms.internal.lg;
 import com.itsa.conn.Connection;
 import com.itsa.conn.packet.AbstractReadablePacket;
-import com.itsa.traffic.element.Car;
+import com.itsa.traffic.R;
+import com.itsa.traffic.element.Services;
 import com.itsa.traffic.handler.TrafficManager;
 
 /**
- * Created on: Jan 27, 2015
+ * 
+ * Created on: Mar 06, 2015.
  * 
  * @author Alisson Oliveira
  *
  */
-public class R_VehiclePacket extends AbstractReadablePacket<TrafficManager> {
-	
-	public static final short OPCODE = 0x03;
-	
+public class R_NotificationPacket extends AbstractReadablePacket<TrafficManager> {
+	public static final int OPCODE = 0xFF;
 	protected int id;
 	protected int service;
 	protected String serviceContext;
-	protected double longitude;
-	protected double latitude;
-	protected double altitude;
+	protected String data;
 	
 	/* (non-Javadoc)
 	 * @see com.itsa.conn.packet.ReadablePacket#read(com.itsa.conn.Connection, java.nio.ByteBuffer)
+	 * 
 	 */
 	@Override
 	public void read(Connection conn, ByteBuffer buf) {
 		id = buf.getInt();
 		service = buf.getInt();
 		serviceContext = readString(buf);
-		longitude = buf.getDouble();
-		latitude = buf.getDouble();
-		altitude = buf.getDouble();
+		data = readString(buf);
+		Log.i("READ",data);
+
 	}
 
 	/* (non-Javadoc)
 	 * @see com.itsa.conn.packet.ReadablePacket#process(com.itsa.conn.Connection, com.itsa.conn.Manager)
+	 * 
 	 */
 	@Override
-	public void process(Connection conn, final TrafficManager manager) {
-		Log.i("Vehicle", "service " + service);
-		manager.addCar(new Car(id, latitude, longitude, service, serviceContext));
-		(new Handler(Looper.getMainLooper())).post(new Runnable() {
-			
-			@Override
-			public void run() {
-				manager.updateTraffic();
-			}
-		});
+	public void process(Connection conn, TrafficManager manager) {
+		Context ctx = manager.getContext();
+		NotificationCompat.Builder notBuilder = new NotificationCompat.Builder(ctx).
+				setSmallIcon(R.drawable.abc_ic_menu_share_mtrl_alpha).
+				setContentTitle(Services.getService(service).name() + ": " + serviceContext).setContentText(data);
 
+		PendingIntent resultPendingIntent = PendingIntent.getActivity(ctx, 0, new Intent(), PendingIntent.FLAG_UPDATE_CURRENT);
+		     
+		notBuilder.setContentIntent(resultPendingIntent);
+		NotificationManager nmn = (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
+		Notification not = notBuilder.build();
+		not.defaults |= Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE;
+		nmn.notify(id, not);
 	}
 
 }

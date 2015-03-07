@@ -58,6 +58,10 @@ public class TrafficManager implements Manager, VoiceCommandHandler {
 	private String destination;
 	private String loc;
 	
+	public Context getContext() {
+		return context;
+	}
+	
 
 	public TrafficManager(Context ctx) {
 		this.context = ctx;

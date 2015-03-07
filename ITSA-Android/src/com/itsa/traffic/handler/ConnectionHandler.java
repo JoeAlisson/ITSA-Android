@@ -25,6 +25,7 @@ import com.itsa.conn.PacketReader;
 import com.itsa.conn.packet.ReadablePacket;
 import com.itsa.traffic.element.Position;
 import com.itsa.traffic.packet.R_InitPacket;
+import com.itsa.traffic.packet.R_NotificationPacket;
 import com.itsa.traffic.packet.R_RoutePacket;
 import com.itsa.traffic.packet.R_VehiclePacket;
 import com.itsa.traffic.packet.R_WSMPacket;
@@ -34,7 +35,7 @@ import com.itsa.traffic.packet.W_PositionUpdate;
  * 
  * @author Alisson Oliveira
  * 
- *   Update on: Jan 02, 2015
+ *   Update on: Mar 06, 2015
  *
  */
 public class ConnectionHandler extends PacketReader<TrafficManager> implements PacketListener<TrafficManager> {
@@ -82,6 +83,9 @@ public class ConnectionHandler extends PacketReader<TrafficManager> implements P
 			break;
 		case R_RoutePacket.OPCODE:
 			packet = new R_RoutePacket();
+			break;
+		case R_NotificationPacket.OPCODE:
+			packet = new R_NotificationPacket();
 			break;
 		default:
 			Log.e("Connection Handler", "No handler to opcode received " + Integer.toHexString(opcode));

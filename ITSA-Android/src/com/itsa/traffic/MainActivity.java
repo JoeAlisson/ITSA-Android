@@ -88,27 +88,6 @@ public class MainActivity extends ActionBarActivity implements OnMapReadyCallbac
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
 		
-		/*NotificationCompat.Builder notBuilder = new NotificationCompat.Builder(this).
-				setSmallIcon(R.drawable.abc_ic_menu_share_mtrl_alpha).
-				setContentTitle("Traffic Message").setContentText("Opening");
-		//Intent resultIntent = new Intent(this, MainActivity.class);
-
-		// The stack builder object will contain an artificial back stack for the
-		// started Activity.
-		// This ensures that navigating backward from the Activity leads out of
-		// your application to the Home screen.
-		//TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-		// Adds the back stack for the Intent (but not the Intent itself)
-		//stackBuilder.addParentStack(MainActivity.class);
-		// Adds the Intent that starts the Activity to the top of the stack
-		//stackBuilder.addNextIntent(resultIntent);
-		PendingIntent resultPendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, new Intent(), PendingIntent.FLAG_UPDATE_CURRENT);
-		     
-		notBuilder.setContentIntent(resultPendingIntent);
-		NotificationManager nmn = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-		Notification not = notBuilder.build();
-		not.defaults |= Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE;
-		nmn.notify(1, not);*/
 		int id = item.getItemId();
 		switch (id) {
 		case R.id.action_settings:

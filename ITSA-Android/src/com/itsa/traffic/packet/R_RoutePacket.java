@@ -56,13 +56,12 @@ public class R_RoutePacket extends R_VehiclePacket {
 	public void process(Connection conn, final TrafficManager manager) {
 		manager.addCar(new Car(id, latitude, longitude, service, serviceContext));
 		(new Handler(Looper.getMainLooper())).post(new Runnable() {
-			
 			@Override
 			public void run() {
 				manager.updateTraffic();
 			}
 		});
-		Log.i("Route", "receiving route");
+
 		StringTokenizer st = new StringTokenizer(route, ",");
 		while(st.hasMoreTokens()) {
 			if(st.nextToken().equalsIgnoreCase(manager.getRequestedDestination())) {
