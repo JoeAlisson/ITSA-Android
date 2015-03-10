@@ -27,6 +27,7 @@ import com.itsa.traffic.element.Position;
 import com.itsa.traffic.packet.R_InitPacket;
 import com.itsa.traffic.packet.R_NotificationPacket;
 import com.itsa.traffic.packet.R_RoutePacket;
+import com.itsa.traffic.packet.R_TLStatePacket;
 import com.itsa.traffic.packet.R_VehiclePacket;
 import com.itsa.traffic.packet.R_WSMPacket;
 import com.itsa.traffic.packet.W_PositionUpdate;
@@ -47,7 +48,6 @@ public class ConnectionHandler extends PacketReader<TrafficManager> implements P
 
 	public void listen() {
 		if(con == null || !con.isConnected()) return;
-		Log.i("Connect", "linsting");
 		(new Thread(this)).start();
 	}
 
@@ -86,6 +86,9 @@ public class ConnectionHandler extends PacketReader<TrafficManager> implements P
 			break;
 		case R_NotificationPacket.OPCODE:
 			packet = new R_NotificationPacket();
+			break;
+		case R_TLStatePacket.OPCODE:
+			packet = new R_TLStatePacket();
 			break;
 		default:
 			Log.e("Connection Handler", "No handler to opcode received " + Integer.toHexString(opcode));
